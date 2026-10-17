@@ -36,7 +36,7 @@ export function ProductThumb({ product, className = "size-12", iconSize = 24, si
 }
 
 /** The Somali name under the German or English one, or the German name when the page is in Somali. */
-export function useSecondName(product: Product) {
+function useSecondName(product: Product) {
   const { lang } = useLang();
   const second = lang === "so" ? product.name.de : product.name.so;
   return second.toLowerCase() === (lang === "so" ? product.name.so : product.name[lang]).toLowerCase() ? null : second;

@@ -123,7 +123,7 @@ function PointsCard() {
   );
 }
 
-export function TrackOrder({ initialId = "" }: { initialId?: string }) {
+function TrackOrder({ initialId = "" }: { initialId?: string }) {
   const { t, lang } = useLang();
   const now = useNow();
   const [orderId, setOrderId] = useState(initialId);

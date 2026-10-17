@@ -9,6 +9,7 @@ import type { PaymentMethod, Quote } from "@/lib/types";
 import { useNow } from "@/lib/use-now";
 import { ProductThumb } from "./product-card";
 import { useLang } from "./providers/lang-provider";
+import { useNav } from "./providers/nav-provider";
 import { type OrderError, useShop } from "./providers/shop-provider";
 import { QuantityControl } from "./quantity-control";
 import { button, iconButton, input } from "./ui";
@@ -117,12 +118,14 @@ function Field({ id, label, hint, error, ...props }: { id: string; label: string
 
 function CheckoutView() {
   const { state, actions, meta } = useShop();
+  const nav = useNav();
   const { t, lang } = useLang();
   const now = useNow();
   const [contact, setContact] = useState<Contact>(readContact);
   const [payment, setPayment] = useState<PaymentMethod>("card");
   const [error, setError] = useState<OrderError | null>(null);
   const [pending, startTransition] = useTransition();
+  const trap = useRef<HTMLInputElement>(null);
   const store = meta.stores.find((s) => s.id === state.storeId) ?? meta.stores[0];
   if (!meta.quote.itemCount) return <EmptyBasket />;
 
@@ -140,7 +143,7 @@ function CheckoutView() {
     }
     try { localStorage.setItem(CONTACT_KEY, JSON.stringify(c)); } catch {}
     startTransition(async () => {
-      setError(await actions.placeOrder({ ...c, phone: c.phone || undefined, payment, lang }));
+      setError(await actions.placeOrder({ ...c, phone: c.phone || undefined, payment, lang, website: trap.current?.value || undefined }));
     });
   }
 
@@ -161,6 +164,8 @@ function CheckoutView() {
           </label>
         </fieldset>
 
+        {/* Bot trap: off-screen and skipped by keyboard and screen readers, so only form-filling bots type here. */}
+        <input ref={trap} type="text" name="website" tabIndex={-1} autoComplete="off" aria-hidden className="absolute -left-[9999px] size-px opacity-0" />
         <fieldset className="grid gap-3 pb-4">
           <legend className="pb-2.5 text-[15px] font-bold">{t.checkout.contact}</legend>
           <Field id="checkout-name" label={t.checkout.name} autoComplete="name" value={contact.name} onChange={set("name")} error={fieldError("name")} />
@@ -179,7 +184,7 @@ function CheckoutView() {
             className={`${button.ghost} ${button.small} justify-self-start`}
             onClick={() => {
               actions.closeDrawer();
-              document.getElementById("delivery")?.scrollIntoView({ behavior: "smooth" });
+              nav.go("delivery");
             }}
           >
             {state.slotId ? t.checkout.changeTime : t.checkout.pickTime}
@@ -218,6 +223,7 @@ function CheckoutView() {
 
 function ConfirmationView() {
   const { state, actions } = useShop();
+  const nav = useNav();
   const { t, lang, money, num } = useLang();
   const now = useNow();
   const order = state.lastOrder;
@@ -237,7 +243,7 @@ function ConfirmationView() {
           className={button.primary}
           onClick={() => {
             actions.closeDrawer();
-            document.getElementById("track")?.scrollIntoView({ behavior: "smooth" });
+            nav.go("track");
           }}
         >
           <MapPinIcon size={20} />
@@ -253,6 +259,7 @@ export function CartDrawer() {
   const { state, actions, meta } = useShop();
   const { t } = useLang();
   const closeRef = useRef<HTMLButtonElement>(null);
+  const panelRef = useRef<HTMLElement>(null);
   const view = state.drawer;
 
   useEffect(() => {
@@ -260,7 +267,16 @@ export function CartDrawer() {
     const previous = document.activeElement as HTMLElement | null;
     closeRef.current?.focus();
     document.body.style.overflow = "hidden";
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && actions.closeDrawer();
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") return actions.closeDrawer();
+      if (e.key !== "Tab" || !panelRef.current) return;
+      // Keep keyboard focus inside the open panel.
+      const items = [...panelRef.current.querySelectorAll<HTMLElement>("button:not([disabled]), a[href], input:not([tabindex=\"-1\"]), select, textarea")];
+      const first = items[0];
+      const last = items.at(-1);
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last?.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first?.focus(); }
+    };
     window.addEventListener("keydown", onKey);
     return () => {
       document.body.style.overflow = "";
@@ -277,6 +293,7 @@ export function CartDrawer() {
     <>
       <div aria-hidden className="fixed inset-0 z-40 bg-[rgb(26_19_13/0.5)] backdrop-blur-[2px]" onClick={actions.closeDrawer} />
       <aside
+        ref={panelRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby="drawer-title"

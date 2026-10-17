@@ -1,16 +1,22 @@
 "use server";
 
 import { refresh } from "next/cache";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { ADMIN_COOKIE, checkPassword, isAdmin, newSessionValue } from "@/lib/admin-auth";
 import { setOrderStage } from "@/lib/orders-store";
+import { allow, clientIp } from "@/lib/rate-limit";
 import type { TrackingStage } from "@/lib/types";
 
 export type LoginState = { error?: string };
 
 export async function login(_prev: LoginState, form: FormData): Promise<LoginState> {
-  const input = String(form.get("password") ?? "");
+  const input = String(form.get("password") ?? "").slice(0, 200);
+  // 10 wrong guesses per connection per 15 minutes, then a lock-out even for the right password.
+  const ip = clientIp(await headers());
+  if (!(await allow("admin-login", ip, 10, 900))) {
+    return { error: "Zu viele Versuche. Warte 15 Minuten und versuch es dann erneut." };
+  }
   if (!checkPassword(input)) {
     // A short pause slows down password guessing.
     await new Promise((r) => setTimeout(r, 800));

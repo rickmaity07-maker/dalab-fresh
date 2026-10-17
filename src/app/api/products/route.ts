@@ -5,7 +5,7 @@ import { getCatalog } from "@/lib/data";
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const cat = searchParams.get("category");
-  const q = searchParams.get("q")?.trim().toLowerCase();
+  const q = searchParams.get("q")?.trim().toLowerCase().slice(0, 80);
   const { categories, products } = await getCatalog();
   const matches = products.filter(
     (p) =>

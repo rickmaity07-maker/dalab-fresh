@@ -4,10 +4,12 @@ import Link from "next/link";
 import { BUSINESS } from "@/lib/business";
 import { BrandMark } from "./brand-mark";
 import { useLang } from "./providers/lang-provider";
+import { useNav } from "./providers/nav-provider";
 import { LanguageSwitch } from "./site-header";
 
 export function SiteFooter() {
   const { t } = useLang();
+  const nav = useNav();
   const columns = [
     { title: t.footer.shop, links: [[t.footer.links.aisles, "#shop"], [t.footer.links.offers, "#offers"]] },
     { title: t.footer.help, links: [[t.footer.links.delivery, "#delivery"], [t.footer.links.track, "#track"], [t.footer.links.stores, "#stores"]] },
@@ -30,7 +32,7 @@ export function SiteFooter() {
             <h2 className="mb-2.5 text-sm font-semibold text-white">{col.title}</h2>
             <ul className="grid gap-1.5">
               {col.links.map(([label, href]) => (
-                <li key={href}><a href={href} className="transition-colors hover:text-[#e3b23c]">{label}</a></li>
+                <li key={href}><a href={href} onClick={(e) => { e.preventDefault(); nav.go(href.slice(1)); }} className="transition-colors hover:text-[#e3b23c]">{label}</a></li>
               ))}
             </ul>
           </nav>

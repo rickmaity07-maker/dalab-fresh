@@ -3,7 +3,7 @@ import Link from "next/link";
 import { BUSINESS } from "@/lib/business";
 import { Wordmark } from "./brand-mark";
 
-export const LEGAL_LINKS = [
+const LEGAL_LINKS = [
   { href: "/impressum", label: "Impressum" },
   { href: "/datenschutz", label: "Datenschutz" },
   { href: "/agb", label: "AGB & Widerruf" },

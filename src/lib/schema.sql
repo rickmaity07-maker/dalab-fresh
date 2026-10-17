@@ -59,3 +59,11 @@ alter table categories add column if not exists photo text;
 alter table orders add column if not exists stage int not null default 0 check (stage between 0 and 3);
 alter table orders add column if not exists stage_at timestamptz;
 create index if not exists orders_open_idx on orders (stage, placed_at desc);
+
+-- Rate limiting (see src/lib/rate-limit.ts). Keys are salted hashes, never raw IP addresses; rows older than a day are deleted.
+create table if not exists rate_hits (
+  key  text        not null,
+  at   timestamptz not null default now()
+);
+create index if not exists rate_hits_key_idx on rate_hits (key, at desc);
+create index if not exists rate_hits_at_idx on rate_hits (at);

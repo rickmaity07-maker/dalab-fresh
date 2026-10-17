@@ -4,9 +4,9 @@ export const FREE_DELIVERY_OVER = 4000; // €40
 export const DELIVERY_FEE = 399;
 export const EXPRESS_FEE = 599;
 /** 1 point per euro; 500 points = €5 off. */
-export const POINTS_PER_EURO = 1;
+const POINTS_PER_EURO = 1;
 
-export const LOCALES: Record<Lang, string> = { de: "de-DE", en: "en-IE", so: "so-SO" };
+const LOCALES: Record<Lang, string> = { de: "de-DE", en: "en-IE", so: "so-SO" };
 
 const money = new Map<Lang, Intl.NumberFormat>();
 export function formatEur(cents: number, lang: Lang = "de") {

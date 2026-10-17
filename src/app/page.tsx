@@ -4,16 +4,17 @@ import { BasketPanel } from "@/components/basket-panel";
 import { CartDrawer } from "@/components/cart-drawer";
 import { Catalog } from "@/components/catalog";
 import { HomeFavourites } from "@/components/home-favourites";
+import { ListScreen } from "@/components/list-screen";
 import { MobileBar } from "@/components/mobile-bar";
 import { Offers } from "@/components/offers";
 import { BrowseProvider } from "@/components/providers/browse-provider";
 import { LangProvider } from "@/components/providers/lang-provider";
+import { NavProvider, Screen } from "@/components/providers/nav-provider";
 import { ShopProvider } from "@/components/providers/shop-provider";
 import { ToastProvider } from "@/components/providers/toast-provider";
 import { Services } from "@/components/services";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
-import { SmartList } from "@/components/smart-list";
 import { StoreList } from "@/components/store-list";
 import { getCatalog } from "@/lib/data";
 import { TIME_ZONE } from "@/lib/slots";
@@ -37,32 +38,49 @@ export default async function Home() {
       <ToastProvider>
         <ShopProvider products={catalog.products} categories={catalog.categories} stores={catalog.stores}>
           <BrowseProvider>
+           <NavProvider>
             <a href="#main" className="sr-only z-50 rounded-[10px] bg-ink px-4 py-2.5 font-semibold text-bg focus:not-sr-only focus:fixed focus:top-3 focus:left-3">Zum Inhalt springen</a>
             <SiteHeader />
             <div className="gutter mx-auto grid max-w-[1600px] gap-6 pt-4 lg:grid-cols-[212px_minmax(0,1fr)] lg:gap-6 lg:pt-5 xl:grid-cols-[224px_minmax(0,1fr)_330px]">
               <div className="hidden lg:block">
                 <AisleNav />
               </div>
+              {/* On phones each <Screen> is one tab of the bottom menu; on desktop they stack as one page. */}
               <main id="main" className="min-w-0 space-y-8">
-                <HomeFavourites />
-                <div id="aisles" className="scroll-mt-24 lg:hidden">
-                  <AisleTiles />
-                </div>
-                <div id="list" className="scroll-mt-24 lg:hidden">
-                  <SmartList />
-                </div>
-                <Offers endsOn={endsOn} />
-                <Catalog />
-                <Services />
-                <StoreList />
+                <Screen tabs={["home"]} className="space-y-8">
+                  <HomeFavourites />
+                  <Offers endsOn={endsOn} />
+                </Screen>
+                <Screen tabs={["aisles"]} className="space-y-8">
+                  <div id="aisles" className="lg:hidden">
+                    <AisleTiles />
+                  </div>
+                  <Catalog />
+                </Screen>
+                <Screen tabs={["list"]} className="lg:hidden">
+                  <ListScreen />
+                </Screen>
+                <Screen tabs={["orders"]}>
+                  <Services />
+                </Screen>
+                <Screen tabs={["home"]}>
+                  <StoreList />
+                </Screen>
               </main>
               <div className="hidden xl:block">
                 <BasketPanel />
               </div>
             </div>
-            <SiteFooter />
+            <Screen tabs={["home"]}>
+              <SiteFooter />
+            </Screen>
+            {/* Room for the bottom menu on screens without the footer. */}
+            <Screen tabs={["aisles", "list", "orders"]} className="lg:hidden">
+              <div aria-hidden className="h-[calc(160px+env(safe-area-inset-bottom,0px))]" />
+            </Screen>
             <MobileBar />
             <CartDrawer />
+           </NavProvider>
           </BrowseProvider>
         </ShopProvider>
       </ToastProvider>

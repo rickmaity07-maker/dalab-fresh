@@ -3,14 +3,14 @@ import type { FulfilmentMode } from "./types";
 // Slot ids: "express" or "YYYY-MM-DD@H" (Berlin date, start hour). Everything runs on Berlin time,
 // so a server in another timezone and a shopper's phone agree on what "today" and "past" mean.
 export const TIME_ZONE = "Europe/Berlin";
-export const SLOT_HOURS: [start: number, end: number][] = [
+const SLOT_HOURS: [start: number, end: number][] = [
   [8, 10],
   [10, 12],
   [14, 16],
   [17, 19],
   [19, 21],
 ];
-export const DAYS_AHEAD = 5;
+const DAYS_AHEAD = 5;
 
 export type SlotStatus = "open" | "past" | "full" | "closed";
 export type Slot = { id: string; start: number; end: number; status: SlotStatus; express?: boolean };

@@ -5,19 +5,19 @@ import Image from "next/image";
 import type { CategoryId } from "@/lib/types";
 import { ProductIcon } from "./product-icon";
 import { useBrowse } from "./providers/browse-provider";
+import { useNav } from "./providers/nav-provider";
 import { useLang } from "./providers/lang-provider";
 import { useShop } from "./providers/shop-provider";
-
-const toShop = () => document.getElementById("shop")?.scrollIntoView({ behavior: "smooth" });
 
 /** Which aisle is selected, as one string: "all", "offers", "saved" or a category id. */
 export function useAisle() {
   const { state, actions } = useBrowse();
+  const nav = useNav();
   const active = state.offersOnly ? "offers" : state.scope.kind === "category" ? state.scope.id : state.scope.kind;
   const go = (id: "all" | "offers" | "saved" | CategoryId) => {
     actions.setOffersOnly(id === "offers");
     actions.setScope(id === "all" || id === "offers" ? { kind: "all" } : id === "saved" ? { kind: "saved" } : { kind: "category", id });
-    toShop();
+    nav.go("shop");
   };
   return { active, go };
 }

@@ -7,7 +7,7 @@ import type { Order, OrderStatus, TrackingStage } from "./types";
 
 // Orders live in Neon. Without DATABASE_URL they go to data/orders.json so local development still works.
 const FILE = path.join(process.cwd(), "data", "orders.json");
-export const SAMPLE_ORDER_ID = "DF-48213";
+const SAMPLE_ORDER_ID = "DF-48213";
 
 const newId = () => `DF-${randomInt(10000, 100000)}`;
 

@@ -198,6 +198,7 @@ const en = {
     mode: "Choose delivery or click and collect.",
     form: "The order could not be sent. Refresh the page and try again.",
     network: "We couldn't reach the store. Check your connection and try again.",
+    tooMany: "Too many orders from this connection. Wait 10 minutes and try again, or call the store.",
   },
   confirm: {
     title: (id: string) => `Thank you, order ${id} is in`,
@@ -432,6 +433,7 @@ const de: Dict = {
     mode: "Wähle Lieferung oder Abholung.",
     form: "Die Bestellung konnte nicht gesendet werden. Lade die Seite neu und versuch es erneut.",
     network: "Wir erreichen den Laden gerade nicht. Prüf deine Verbindung und versuch es erneut.",
+    tooMany: "Zu viele Bestellungen von dieser Verbindung. Warte 10 Minuten und versuch es erneut, oder ruf die Filiale an.",
   },
   confirm: {
     title: (id: string) => `Danke, Bestellung ${id} ist eingegangen`,
@@ -664,6 +666,7 @@ const so: Dict = {
     mode: "Dooro gaarsiin ama ka qaadasho dukaanka.",
     form: "Dalabka lama diri karin. Dib u cusbooneysii bogga oo mar kale isku day.",
     network: "Dukaanka lama gaari karo. Hubi xiriirkaaga oo mar kale isku day.",
+    tooMany: "Dalabyo badan ayaa ka yimid xiriirkan. Sug 10 daqiiqo oo mar kale isku day, ama wac dukaanka.",
   },
   confirm: {
     title: (id: string) => `Mahadsanid, dalabka ${id} waa la helay`,

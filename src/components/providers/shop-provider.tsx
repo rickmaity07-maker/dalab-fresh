@@ -8,7 +8,7 @@ type DrawerView = "basket" | "checkout" | "confirmation";
 export type PlacedOrder = { id: string; slotId: string; mode: FulfilmentMode; points: number; total: number; email: string };
 /** `field` names the input to flag and the translated message to show (see DICTS[lang].errors). */
 export type OrderError = { field: string };
-export type OrderDetails = Pick<OrderRequest, "name" | "email" | "phone" | "address" | "payment" | "lang">;
+export type OrderDetails = Pick<OrderRequest, "name" | "email" | "phone" | "address" | "payment" | "lang" | "website">;
 
 type ShopState = {
   cart: Record<number, number>;

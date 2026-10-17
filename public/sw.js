@@ -1,7 +1,7 @@
 // Dalab Fresh service worker: lets the installed app open instantly and show the last shop page when offline.
 // Pages: network first, falling back to the cached copy. Static files and photos: cache first.
 // API calls and the staff page (/admin) are never cached.
-const VERSION = "dalab-v2";
+const VERSION = "dalab-v3";
 const SHELL = ["/", "/manifest.webmanifest", "/icons/icon-192.png"];
 
 self.addEventListener("install", (event) => {

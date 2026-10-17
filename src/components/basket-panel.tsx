@@ -9,7 +9,7 @@ import { QuantityControl } from "./quantity-control";
 import { SmartList } from "./smart-list";
 
 /** Progress towards free delivery, shared by the desktop panel and the drawer. */
-export function FreeDeliveryBar() {
+function FreeDeliveryBar() {
   const { state, meta } = useShop();
   const { t, money } = useLang();
   if (state.mode !== "delivery" || !meta.quote.itemCount) return null;

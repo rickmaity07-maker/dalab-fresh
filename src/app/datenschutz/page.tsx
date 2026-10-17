@@ -48,6 +48,11 @@ export default function Datenschutz() {
       <p>
         Bestellungen speichern wir in einer Datenbank von Neon (Databricks, Inc.) auf Servern in Frankfurt am Main (AWS, Region eu-central-1).
       </p>
+      <p>
+        Zum Schutz vor Missbrauch (gefälschte Bestellungen, Spam-E-Mails, Erraten von Bestellnummern oder Passwörtern) zählen wir, wie oft
+        eine Verbindung bestellt oder eine Bestellung abfragt. Dafür speichern wir die IP-Adresse nicht im Klartext, sondern nur als
+        unkenntlich gemachten Prüfwert (Hash), der nach spätestens 24 Stunden automatisch gelöscht wird.
+      </p>
       <p>Rechtsgrundlage: Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an einem sicheren, zuverlässigen Betrieb) und Art. 28 DSGVO (Auftragsverarbeitung).</p>
 
       <h2>4. E-Mail</h2>

@@ -59,6 +59,8 @@ export type OrderRequest = {
   address?: string;
   payment: PaymentMethod;
   lang: Lang;
+  /** Hidden trap field: always empty for people. */
+  website?: string;
 };
 
 export type Quote = {

@@ -6,9 +6,8 @@ import { LANGS } from "@/lib/i18n";
 import { Wordmark } from "./brand-mark";
 import { useBrowse } from "./providers/browse-provider";
 import { useLang } from "./providers/lang-provider";
+import { useNav } from "./providers/nav-provider";
 import { useShop } from "./providers/shop-provider";
-
-const scrollTo = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
 
 export function LanguageSwitch({ className = "inline-flex" }: { className?: string }) {
   const { lang, setLang, t } = useLang();
@@ -36,6 +35,7 @@ export function SiteHeader() {
   const { state, actions, meta } = useShop();
   const { t, money } = useLang();
   const browse = useBrowse();
+  const nav = useNav();
   const [term, setTerm] = useState("");
   const store = meta.stores.find((s) => s.id === state.storeId) ?? meta.stores[0];
 
@@ -44,7 +44,7 @@ export function SiteHeader() {
       <div aria-hidden className="fixed inset-x-0 top-0 z-30 h-[env(safe-area-inset-top,0px)] bg-surface" />
       <header className="sticky top-[env(safe-area-inset-top,0px)] z-20 border-b border-line bg-surface">
         <div className="gutter mx-auto flex max-w-[1600px] flex-wrap items-center gap-x-4 gap-y-3 py-3 lg:h-[68px] lg:flex-nowrap lg:py-0">
-          <a href="#" aria-label={t.header.home} className="text-ink no-underline lg:w-[212px] lg:shrink-0">
+          <a href="#" onClick={(e) => { e.preventDefault(); nav.go("home"); }} aria-label={t.header.home} className="text-ink no-underline lg:w-[212px] lg:shrink-0">
             <Wordmark />
           </a>
 
@@ -55,7 +55,7 @@ export function SiteHeader() {
               e.preventDefault();
               browse.actions.setQuery(term);
               browse.actions.setScope({ kind: "all" });
-              scrollTo("shop");
+              nav.go("shop");
             }}
           >
             <MagnifyingGlassIcon size={19} className="shrink-0 text-muted" />
@@ -68,8 +68,15 @@ export function SiteHeader() {
               placeholder={t.header.searchPlaceholder}
               value={term}
               onChange={(e) => {
+                // A new search looks through the whole shop, not just the aisle that was open.
+                if (!term.trim() && e.target.value.trim()) {
+                  browse.actions.setScope({ kind: "all" });
+                  browse.actions.setOffersOnly(false);
+                }
                 setTerm(e.target.value);
                 browse.actions.setQuery(e.target.value);
+                // Typing on another phone screen opens the products, where the results are.
+                if (e.target.value.trim() && nav.tab !== "aisles") nav.go("shop");
               }}
               className="h-full min-w-0 flex-1 bg-transparent outline-none placeholder:text-muted"
             />
@@ -78,7 +85,7 @@ export function SiteHeader() {
           <div className="ml-auto flex items-center gap-2">
             <button
               type="button"
-              onClick={() => scrollTo(state.mode === "delivery" ? "delivery" : "stores")}
+              onClick={() => nav.go(state.mode === "delivery" ? "delivery" : "stores")}
               className="hidden min-h-11 items-center gap-2 rounded-[12px] border border-line px-3.5 text-sm transition-colors hover:border-ink md:inline-flex"
             >
               {state.mode === "delivery" ? <TruckIcon size={18} className="text-good" /> : <StorefrontIcon size={18} className="text-good" />}

@@ -4,6 +4,7 @@ import { DICTS, isLang } from "@/lib/i18n";
 import { sendOrderEmails } from "@/lib/mailer";
 import { saveOrder } from "@/lib/orders-store";
 import { quote } from "@/lib/pricing";
+import { allow, clientIp } from "@/lib/rate-limit";
 import { isSlotBookable } from "@/lib/slots";
 import type { OrderRequest, Product } from "@/lib/types";
 
@@ -12,20 +13,33 @@ type ErrorField = keyof (typeof DICTS)["en"]["errors"];
 const fail = (field: ErrorField, status = 400) => NextResponse.json({ field, message: DICTS.en.errors[field] }, { status });
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-const clean = (v: unknown, max: number) => (typeof v === "string" ? v.trim().slice(0, max) : "");
+// Control characters (line breaks, tabs, NUL) have no place in a name or address and could break email layout.
+const CONTROL = /[\u0000-\u001f\u007f]+/g;
+const clean = (v: unknown, max: number) => (typeof v === "string" ? v.replace(CONTROL, " ").trim().slice(0, max) : "");
+const MAX_BODY = 32_000; // bytes; a full basket is a few kB
+const MAX_LINES = 80;
 
 export async function POST(req: Request) {
-  let body: Partial<OrderRequest>;
+  let body: Partial<OrderRequest> & { website?: unknown };
   try {
-    body = await req.json();
+    const raw = await req.text();
+    if (raw.length > MAX_BODY) return fail("form", 413);
+    body = JSON.parse(raw);
   } catch {
     return fail("form");
+  }
+  if (!body || typeof body !== "object") return fail("form");
+
+  // Hidden "website" field: people never see it, form-filling bots do. Pretend success without saving or emailing.
+  if (typeof body.website === "string" && body.website.trim()) {
+    return NextResponse.json({ id: "DF-00000", slotId: String(body.slotId ?? ""), mode: "delivery", points: 0, total: 0, email: "" }, { status: 201 });
   }
 
   const { products, stores } = await getCatalog();
   const byId = new Map(products.map((p) => [p.id, p]));
 
   const items = Array.isArray(body.items) ? body.items : [];
+  if (items.length > MAX_LINES) return fail("items");
   const lines: { product: Product; qty: number }[] = [];
   for (const item of items) {
     const product = byId.get(Number(item?.id));
@@ -47,6 +61,10 @@ export async function POST(req: Request) {
   if (name.length < 2) return fail("name");
   if (!EMAIL.test(email)) return fail("email");
   if (mode === "delivery" && address.length < 8) return fail("address");
+
+  // Every order sends an email, so cap orders per connection and per address to stop spam and fake orders.
+  const [ipOk, mailOk] = await Promise.all([allow("order", clientIp(req), 5, 600), allow("order-mail", email, 5, 3600)]);
+  if (!ipOk || !mailOk) return fail("tooMany", 429);
 
   const now = new Date();
   const slotId = String(body.slotId ?? "");

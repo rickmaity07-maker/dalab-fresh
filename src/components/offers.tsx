@@ -21,7 +21,7 @@ export function Offers({ endsOn }: { endsOn: string }) {
   const end = new Date(`${endsOn}T00:00:00Z`);
 
   return (
-    <section id="offers" aria-labelledby="offers-title">
+    <section id="offers" aria-labelledby="offers-title" className="scroll-mt-24">
       <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
         <h2 id="offers-title" className="text-[clamp(20px,2.2vw,24px)] font-extrabold">{t.offers.title}</h2>
         <span className="inline-flex items-center gap-1.5 text-sm text-muted"><TimerIcon size={16} />{t.offers.ends(formatDay(end, lang, { weekday: "long" }))}</span>

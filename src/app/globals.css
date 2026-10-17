@@ -81,6 +81,7 @@
   --animate-slide-up: slide-up 0.35s cubic-bezier(0.16, 1, 0.3, 1);
   --animate-toast-in: toast-in 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   --animate-pop: pop 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-screen-in: screen-in 0.22s cubic-bezier(0.16, 1, 0.3, 1);
 
   @keyframes slide-in {
     from { transform: translateX(100%); }
@@ -94,6 +95,10 @@
     from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: none; }
   }
+  @keyframes screen-in {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: none; }
+  }
   @keyframes pop {
     from { opacity: 0; transform: scale(0.94); }
     to { opacity: 1; transform: none; }
@@ -101,12 +106,24 @@
 }
 
 @layer base {
-  html { scroll-behavior: smooth; scroll-padding-top: 88px; -webkit-tap-highlight-color: transparent; }
+  /* Sections carry scroll-mt-24 (96px); this adds the rest of the taller two-row phone header. */
+  html { scroll-behavior: smooth; scroll-padding-top: 36px; -webkit-tap-highlight-color: transparent; }
+  @media (min-width: 1024px) { html { scroll-padding-top: 0; } }
   body { background: var(--bg); color: var(--ink); }
   h1, h2, h3 { text-wrap: balance; letter-spacing: -0.02em; }
   p { text-wrap: pretty; }
   /* Ink ring: gold alone is too faint on white to meet the 3:1 focus contrast. */
   :focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+  /* Taps act at once (no double-tap zoom delay), like buttons in a native app. */
+  a, button, label, select, summary { touch-action: manipulation; }
+  /* iPhones zoom into any text box smaller than 16px; keep phone inputs at 16px so the page stays put. */
+  @media (max-width: 1023.98px) {
+    input, select, textarea { font-size: max(16px, 1em) !important; }
+  }
+  /* The installed app: no rubber-band bounce revealing a blank page behind the bars. */
+  @media (display-mode: standalone) {
+    html, body { overscroll-behavior-y: none; }
+  }
 }
 
 @layer components {
