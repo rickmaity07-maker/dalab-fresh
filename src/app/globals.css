@@ -1,26 +1,131 @@
 @import "tailwindcss";
 
+/* Black and gold on light grey, in the spirit of a friendly grocery app (Picnic, Knuspr).
+   Black carries actions and text, gold marks the brand and "add", red is only for offers, green only for delivery.
+   Shapes: cards and panels 14px, small pieces 10px, chips and round buttons full. */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --bg: #f4f4f1;
+  --surface: #ffffff;
+  --surface-2: #efeee9;
+  --ink: #141414;
+  --muted: #6b6a66;
+  --line: #e8e6e1;
+  --accent: #141414;
+  --accent-ink: #ffffff;
+  --accent-soft: #fbf3dd;
+  --gold: #e3b23c;
+  --gold-ink: #141414;
+  --gold-soft: #fbf3dd;
+  --gold-line: #ecd590;
+  --gold-text: #8a6a10;
+  --sale: #c8102e;
+  --good: #1e7a46;
+  --bad: #c0362c;
+  --shadow: 0 1px 2px rgb(20 20 20 / 0.06);
+  --shadow-lift: 0 18px 40px -22px rgb(20 20 20 / 0.35);
+  color-scheme: light;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --bg: #121211;
+    --surface: #1c1c1a;
+    --surface-2: #262623;
+    --ink: #f4f2ec;
+    --muted: #a8a59d;
+    --line: #2f2f2b;
+    --accent: #e3b23c;
+    --accent-ink: #141414;
+    --accent-soft: #2e2716;
+    --gold: #e3b23c;
+    --gold-ink: #141414;
+    --gold-soft: #2e2716;
+    --gold-line: #5a4a1f;
+    --gold-text: #e9c46a;
+    --sale: #ff5a6a;
+    --good: #5fcf8f;
+    --bad: #ff8a7a;
+    --shadow: 0 1px 2px rgb(0 0 0 / 0.4);
+    --shadow-lift: 0 18px 40px -20px rgb(0 0 0 / 0.8);
+    color-scheme: dark;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-accent-soft: var(--accent-soft);
+  --color-gold: var(--gold);
+  --color-gold-ink: var(--gold-ink);
+  --color-gold-soft: var(--gold-soft);
+  --color-gold-line: var(--gold-line);
+  --color-gold-text: var(--gold-text);
+  --color-sale: var(--sale);
+  --color-good: var(--good);
+  --color-bad: var(--bad);
+  --font-sans: var(--font-jakarta), "Segoe UI", system-ui, -apple-system, sans-serif;
+  --radius-panel: 14px;
+  --radius-tile: 10px;
+  --shadow-soft: var(--shadow);
+  --shadow-lift: var(--shadow-lift);
+}
+
+@theme {
+  --animate-slide-in: slide-in 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-slide-up: slide-up 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-toast-in: toast-in 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-pop: pop 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+
+  @keyframes slide-in {
+    from { transform: translateX(100%); }
+    to { transform: none; }
+  }
+  @keyframes slide-up {
+    from { transform: translateY(100%); }
+    to { transform: none; }
+  }
+  @keyframes toast-in {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: none; }
+  }
+  @keyframes pop {
+    from { opacity: 0; transform: scale(0.94); }
+    to { opacity: 1; transform: none; }
+  }
+}
+
+@layer base {
+  html { scroll-behavior: smooth; scroll-padding-top: 88px; -webkit-tap-highlight-color: transparent; }
+  body { background: var(--bg); color: var(--ink); }
+  h1, h2, h3 { text-wrap: balance; letter-spacing: -0.02em; }
+  p { text-wrap: pretty; }
+  :focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+}
+
+@layer components {
+  /* Swipeable rows: the cards show there is more, so the scrollbar is hidden. */
+  .no-scrollbar { scrollbar-width: none; }
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+
+  /* Hue-tinted backdrop for products without a photo (--h is set per product). */
+  .tint { color: hsl(var(--h) 55% 36%); background: hsl(var(--h) 60% 50% / 0.12); }
+  @media (prefers-color-scheme: dark) {
+    .tint { color: hsl(var(--h) 65% 72%); background: hsl(var(--h) 50% 50% / 0.16); }
+  }
+
+  .gutter {
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  html { scroll-behavior: auto; }
 }

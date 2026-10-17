@@ -1,4 +1,8 @@
-// Prices are stored in fils (1 AED = 100 fils) so totals never drift from float rounding.
+// Prices are stored in cents (1 EUR = 100 cents) so totals never drift from float rounding.
+
+export type Lang = "de" | "en" | "so";
+/** A piece of text in every supported language. */
+export type L10n = Record<Lang, string>;
 
 export type CategoryId =
   | "fruit"
@@ -12,26 +16,32 @@ export type CategoryId =
   | "baby";
 
 export type IconKey =
-  | "grid" | "fruit" | "citrus" | "cherries" | "carrot" | "leaf" | "milk" | "egg" | "cheese"
-  | "bread" | "croissant" | "cake" | "drumstick" | "beef" | "fish" | "shrimp" | "grains"
-  | "bean" | "oil" | "coffee" | "date" | "water" | "soda" | "tea" | "popcorn" | "cookie"
-  | "nuts" | "candy" | "spray" | "laundry" | "baby";
+  | "grid" | "fruit" | "mango" | "citrus" | "tomato" | "onion" | "leaf" | "chilli" | "milk" | "egg"
+  | "jar" | "flatbread" | "pastry" | "meat" | "drumstick" | "fish" | "grains" | "pasta" | "spice"
+  | "bean" | "oil" | "date" | "tea" | "juice" | "water" | "sweet" | "cookie" | "nuts"
+  | "soap" | "laundry" | "incense" | "baby";
 
-export type Category = { id: CategoryId; name: string; icon: IconKey };
+export type Category = { id: CategoryId; name: L10n; icon: IconKey; photo?: string };
 
 export type Product = {
   id: number;
-  name: string;
-  size: string;
+  name: L10n;
+  size: L10n;
   price: number;
   was?: number;
   category: CategoryId;
   icon: IconKey;
   hue: number;
   keywords: string[];
+  /** Shown in the "Taste of home" row. */
+  homeFavourite?: boolean;
+  /** Bundled photo in /public, used until a Cloudinary image is uploaded. */
+  photo?: string;
+  /** Cloudinary public id, e.g. "dalab/products/canjeero". */
+  image?: string;
 };
 
-export type Store = { id: string; name: string; city: string; area: string; hours: string };
+export type Store = { id: string; name: string; city: string; area: string; hours: L10n };
 
 export type FulfilmentMode = "delivery" | "collect";
 export type PaymentMethod = "card" | "cash";
@@ -43,8 +53,12 @@ export type OrderRequest = {
   mode: FulfilmentMode;
   slotId: string;
   storeId: string;
+  name: string;
+  email: string;
+  phone?: string;
   address?: string;
   payment: PaymentMethod;
+  lang: Lang;
 };
 
 export type Quote = {
@@ -61,13 +75,16 @@ export type Order = {
   placedAt: string;
   mode: FulfilmentMode;
   slotId: string;
-  slotLabel: string;
   storeId: string;
+  name: string;
+  email: string;
+  phone?: string;
   address?: string;
   payment: PaymentMethod;
+  lang: Lang;
   items: (CartLine & { name: string; price: number })[];
   quote: Quote;
 };
 
 export type TrackingStage = 0 | 1 | 2 | 3;
-export type OrderStatus = { id: string; slotLabel: string; mode: FulfilmentMode; stage: TrackingStage; sample?: boolean };
+export type OrderStatus = { id: string; slotId: string; mode: FulfilmentMode; stage: TrackingStage; sample?: boolean };

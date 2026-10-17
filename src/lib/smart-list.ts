@@ -2,21 +2,23 @@ import type { Product } from "./types";
 
 export type ListMatch = { raw: string; qty: number; product: Product | null };
 
-const SPLIT = /[,\n;]+|\band\b/i;
-const LEADING_QTY = /^(\d+)\s*(x|pcs|packs?|bottles?|kg)?\s*(of\s+)?/;
+// "and" / "und" / "iyo" join items in English, German and Somali.
+const SPLIT = /[,\n;]+|\b(?:and|und|iyo)\b/i;
+const LEADING_QTY = /^(\d+)\s*(x|stk\.?|stück|pcs|packs?|kg|xabbo)?\s*(of\s+)?/;
 
-// Turns "2 milk, eggs and bananas" into product matches. Longest keyword wins, so "olive oil" beats "oil".
+// Turns "2 canjeero, xawaash und Tee" into product matches. Longest keyword wins, so "caano geel" beats "caano".
 export function parseShoppingList(text: string, products: Product[]): ListMatch[] {
   return text
     .split(SPLIT)
-    .map((s) => s.trim())
+    .map((s) => s?.trim())
     .filter(Boolean)
     .map((raw) => {
       let qty = 1;
       let rest = raw.toLowerCase();
       const m = rest.match(LEADING_QTY);
       if (m && m[0].trim()) {
-        qty = Math.min(99, Math.max(1, parseInt(m[1], 10)));
+        // "5 kg rice" means one 5 kg bag, not five of them.
+        qty = m[2] === "kg" ? 1 : Math.min(99, Math.max(1, parseInt(m[1], 10)));
         rest = rest.slice(m[0].length);
       }
       let best: Product | null = null;

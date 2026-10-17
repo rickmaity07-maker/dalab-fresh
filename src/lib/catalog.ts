@@ -1,64 +1,83 @@
-import type { Category, Product, Store } from "./types";
+import type { Category, L10n, Product, Store } from "./types";
 
-// Sample catalogue. Replace with a database or POS feed; the API routes and UI only depend on these shapes.
+// Seed catalogue. `npm run db:setup` copies it into Neon; after that the site reads from the database.
+const l = (de: string, en: string, so: string): L10n => ({ de, en, so });
 
 export const CATEGORIES: Category[] = [
-  { id: "fruit", name: "Fruit and veg", icon: "fruit" },
-  { id: "dairy", name: "Dairy and eggs", icon: "milk" },
-  { id: "bakery", name: "Bakery", icon: "bread" },
-  { id: "meat", name: "Meat and seafood", icon: "beef" },
-  { id: "pantry", name: "Pantry", icon: "grains" },
-  { id: "drinks", name: "Drinks", icon: "soda" },
-  { id: "snacks", name: "Snacks", icon: "cookie" },
-  { id: "home", name: "Household", icon: "spray" },
-  { id: "baby", name: "Baby", icon: "baby" },
+  { id: "fruit", name: l("Obst & Gemüse", "Fruit & veg", "Khudaar & miro"), icon: "mango", photo: "/photos/cat-fruit.jpg" },
+  { id: "dairy", name: l("Milch & Eier", "Dairy & eggs", "Caano & ukun"), icon: "milk", photo: "/photos/cat-dairy.jpg" },
+  { id: "bakery", name: l("Brot & Canjeero", "Bread & canjeero", "Rooti & canjeero"), icon: "flatbread", photo: "/photos/cat-bakery.jpg" },
+  { id: "meat", name: l("Halal Fleisch & Fisch", "Halal meat & fish", "Hilib xalaal & kalluun"), icon: "meat", photo: "/photos/cat-meat.jpg" },
+  { id: "pantry", name: l("Vorrat & Gewürze", "Pantry & spices", "Raashin & xawaash"), icon: "spice", photo: "/photos/cat-pantry.jpg" },
+  { id: "drinks", name: l("Getränke", "Drinks", "Cabitaan"), icon: "juice", photo: "/photos/cat-drinks.jpg" },
+  { id: "snacks", name: l("Süßes & Snacks", "Sweets & snacks", "Macmacaan"), icon: "sweet", photo: "/photos/cat-snacks.jpg" },
+  { id: "home", name: l("Haushalt", "Household", "Alaabta guriga"), icon: "incense", photo: "/photos/uunsi.jpg" },
+  { id: "baby", name: l("Baby", "Baby", "Ilmaha"), icon: "baby" },
 ];
+
+const kg = l("1 kg", "1 kg", "1 kg");
+const g = (n: number) => l(`${n} g`, `${n} g`, `${n} g`);
+const pcs = (n: number) => l(`${n} Stück`, `${n} pieces`, `${n} xabbo`);
 
 export const PRODUCTS: Product[] = [
-  { id: 1, name: "Bananas", size: "1 kg", price: 525, category: "fruit", icon: "fruit", hue: 48, keywords: ["banana"] },
-  { id: 2, name: "Royal Gala apples", size: "1 kg", price: 895, was: 1050, category: "fruit", icon: "fruit", hue: 2, keywords: ["apple"] },
-  { id: 3, name: "Oranges", size: "1 kg", price: 475, category: "fruit", icon: "citrus", hue: 28, keywords: ["orange"] },
-  { id: 4, name: "Red grapes", size: "500 g", price: 950, category: "fruit", icon: "cherries", hue: 290, keywords: ["grape"] },
-  { id: 5, name: "Carrots", size: "1 kg", price: 395, category: "fruit", icon: "carrot", hue: 22, keywords: ["carrot"] },
-  { id: 6, name: "Iceberg lettuce", size: "1 piece", price: 425, category: "fruit", icon: "leaf", hue: 110, keywords: ["lettuce", "salad"] },
-  { id: 7, name: "Cherries", size: "250 g", price: 1800, was: 2200, category: "fruit", icon: "cherries", hue: 350, keywords: ["cherr"] },
-  { id: 8, name: "Lemons", size: "500 g", price: 450, category: "fruit", icon: "citrus", hue: 56, keywords: ["lemon"] },
-  { id: 9, name: "Fresh milk, full fat", size: "2 L", price: 1150, category: "dairy", icon: "milk", hue: 210, keywords: ["milk"] },
-  { id: 10, name: "Large white eggs", size: "30 pieces", price: 2295, was: 2650, category: "dairy", icon: "egg", hue: 40, keywords: ["egg"] },
-  { id: 11, name: "Labneh", size: "400 g", price: 975, category: "dairy", icon: "milk", hue: 190, keywords: ["labneh"] },
-  { id: 12, name: "Halloumi", size: "225 g", price: 1325, category: "dairy", icon: "cheese", hue: 46, keywords: ["halloumi", "cheese"] },
-  { id: 13, name: "Arabic bread", size: "6 pieces", price: 250, category: "bakery", icon: "bread", hue: 36, keywords: ["arabic bread", "khubz", "bread", "pita"] },
-  { id: 14, name: "Butter croissants", size: "4 pieces", price: 1200, category: "bakery", icon: "croissant", hue: 34, keywords: ["croissant"] },
-  { id: 15, name: "Chocolate cake", size: "500 g", price: 2400, was: 2900, category: "bakery", icon: "cake", hue: 18, keywords: ["cake"] },
-  { id: 16, name: "Chicken drumsticks", size: "1 kg", price: 1695, category: "meat", icon: "drumstick", hue: 20, keywords: ["chicken", "drumstick"] },
-  { id: 17, name: "Beef mince", size: "500 g", price: 1950, category: "meat", icon: "beef", hue: 356, keywords: ["beef", "mince"] },
-  { id: 18, name: "Hammour fillet", size: "500 g", price: 3400, was: 3900, category: "meat", icon: "fish", hue: 196, keywords: ["hammour", "fish"] },
-  { id: 19, name: "Tiger prawns", size: "500 g", price: 2975, category: "meat", icon: "shrimp", hue: 14, keywords: ["prawn", "shrimp"] },
-  { id: 20, name: "Basmati rice", size: "5 kg", price: 4250, category: "pantry", icon: "grains", hue: 44, keywords: ["rice", "basmati"] },
-  { id: 21, name: "Chickpeas", size: "400 g", price: 325, category: "pantry", icon: "bean", hue: 38, keywords: ["chickpea", "hummus"] },
-  { id: 22, name: "Extra virgin olive oil", size: "1 L", price: 3200, category: "pantry", icon: "oil", hue: 80, keywords: ["olive oil", "oil"] },
-  { id: 23, name: "Arabic coffee", size: "250 g", price: 2150, category: "pantry", icon: "coffee", hue: 26, keywords: ["coffee", "qahwa"] },
-  { id: 24, name: "Khalas dates", size: "1 kg", price: 2600, was: 3100, category: "pantry", icon: "date", hue: 24, keywords: ["date"] },
-  { id: 25, name: "Drinking water", size: "12 x 1.5 L", price: 1350, was: 1575, category: "drinks", icon: "water", hue: 200, keywords: ["water"] },
-  { id: 26, name: "Orange juice", size: "1.75 L", price: 1025, category: "drinks", icon: "citrus", hue: 32, keywords: ["juice"] },
-  { id: 27, name: "Cola", size: "6 x 330 ml", price: 1100, category: "drinks", icon: "soda", hue: 0, keywords: ["cola", "soda", "pepsi", "coke"] },
-  { id: 28, name: "Green tea", size: "50 bags", price: 925, category: "drinks", icon: "tea", hue: 120, keywords: ["tea"] },
-  { id: 29, name: "Butter popcorn", size: "3 bags", price: 650, category: "snacks", icon: "popcorn", hue: 50, keywords: ["popcorn"] },
-  { id: 30, name: "Chocolate chip cookies", size: "300 g", price: 825, was: 995, category: "snacks", icon: "cookie", hue: 30, keywords: ["cookie", "biscuit"] },
-  { id: 31, name: "Mixed nuts", size: "400 g", price: 2750, category: "snacks", icon: "nuts", hue: 32, keywords: ["nuts", "almond", "cashew"] },
-  { id: 32, name: "Milk chocolate bar", size: "100 g", price: 375, category: "snacks", icon: "candy", hue: 330, keywords: ["chocolate"] },
-  { id: 33, name: "Dishwashing liquid", size: "1 L", price: 795, category: "home", icon: "spray", hue: 150, keywords: ["dish", "washing up"] },
-  { id: 34, name: "Laundry detergent", size: "3 L", price: 2900, was: 3450, category: "home", icon: "laundry", hue: 220, keywords: ["laundry", "detergent"] },
-  { id: 35, name: "Diapers, size 4", size: "64 pieces", price: 5900, was: 6800, category: "baby", icon: "baby", hue: 260, keywords: ["diaper", "nappies", "nappy"] },
-  { id: 36, name: "Baby wipes", size: "3 x 72", price: 1250, category: "baby", icon: "baby", hue: 180, keywords: ["wipes"] },
+  { id: 1, name: l("Bananen", "Bananas", "Moos"), size: kg, price: 199, category: "fruit", icon: "fruit", hue: 48, keywords: ["banane", "banana", "moos"] },
+  { id: 2, name: l("Mangos", "Mangoes", "Cambe"), size: pcs(2), price: 349, was: 449, category: "fruit", icon: "mango", hue: 36, keywords: ["mango", "cambe"], photo: "/photos/mango.jpg" },
+  { id: 3, name: l("Papaya", "Papaya", "Babaay"), size: pcs(1), price: 299, category: "fruit", icon: "mango", hue: 22, keywords: ["papaya", "babaay"] },
+  { id: 4, name: l("Limetten", "Limes", "Liin dhanaan"), size: g(500), price: 249, category: "fruit", icon: "citrus", hue: 95, keywords: ["limette", "lime", "liin"] },
+  { id: 5, name: l("Tomaten", "Tomatoes", "Yaanyo"), size: kg, price: 279, category: "fruit", icon: "tomato", hue: 4, keywords: ["tomate", "tomato", "yaanyo"] },
+  { id: 6, name: l("Rote Zwiebeln", "Red onions", "Basal guduud"), size: l("2 kg", "2 kg", "2 kg"), price: 299, category: "fruit", icon: "onion", hue: 330, keywords: ["zwiebel", "onion", "basal"] },
+  { id: 7, name: l("Frischer Koriander", "Fresh coriander", "Kabsar"), size: l("1 Bund", "1 bunch", "1 xidhmo"), price: 99, category: "fruit", icon: "leaf", hue: 120, keywords: ["koriander", "coriander", "cilantro", "kabsar"] },
+  { id: 8, name: l("Grüne Chilis", "Green chillies", "Basbaas cagaar"), size: g(200), price: 149, category: "fruit", icon: "chilli", hue: 105, keywords: ["chili", "chilli", "basbaas"] },
+
+  { id: 9, name: l("Kamelmilch", "Camel milk", "Caano geel"), size: l("500 ml", "500 ml", "500 ml"), price: 549, was: 649, category: "dairy", icon: "milk", hue: 38, keywords: ["kamelmilch", "camel milk", "caano geel", "geel"], homeFavourite: true, photo: "/photos/camel.jpg" },
+  { id: 10, name: l("Frische Vollmilch", "Fresh whole milk", "Caano lo'aad"), size: l("1 L", "1 L", "1 L"), price: 119, category: "dairy", icon: "milk", hue: 210, keywords: ["milch", "milk", "caano"] },
+  { id: 11, name: l("Eier, Freiland", "Free-range eggs", "Ukun"), size: pcs(10), price: 299, category: "dairy", icon: "egg", hue: 40, keywords: ["eier", "egg", "ukun"] },
+  { id: 12, name: l("Naturjoghurt", "Natural yoghurt", "Caano fadhi"), size: kg, price: 179, category: "dairy", icon: "jar", hue: 200, keywords: ["joghurt", "yoghurt", "yogurt", "fadhi"] },
+  { id: 13, name: l("Ghee (Butterschmalz)", "Ghee", "Subag"), size: g(500), price: 799, category: "dairy", icon: "jar", hue: 45, keywords: ["ghee", "butterschmalz", "subag"], homeFavourite: true },
+
+  { id: 14, name: l("Canjeero, frisch", "Fresh canjeero", "Canjeero"), size: pcs(10), price: 399, category: "bakery", icon: "flatbread", hue: 34, keywords: ["canjeero", "anjero", "laxoox", "injera"], homeFavourite: true, photo: "/photos/canjeero.jpg" },
+  { id: 15, name: l("Muufo Fladenbrot", "Muufo flatbread", "Muufo"), size: pcs(6), price: 349, category: "bakery", icon: "flatbread", hue: 30, keywords: ["muufo", "fladenbrot", "flatbread", "brot", "bread"] },
+  { id: 16, name: l("Sambuusa, tiefgekühlt", "Frozen sambuusa", "Sambuusa"), size: pcs(12), price: 649, was: 749, category: "bakery", icon: "pastry", hue: 28, keywords: ["sambuusa", "sambusa", "samosa"], homeFavourite: true, photo: "/photos/sambuusa.jpg" },
+  { id: 17, name: l("Malawax Pfannkuchen", "Malawax pancakes", "Malawax"), size: pcs(8), price: 449, category: "bakery", icon: "flatbread", hue: 42, keywords: ["malawax", "pfannkuchen", "pancake"] },
+
+  { id: 18, name: l("Ziegenfleisch", "Goat meat", "Hilib ari"), size: kg, price: 1499, category: "meat", icon: "meat", hue: 356, keywords: ["ziege", "goat", "hilib ari"], homeFavourite: true },
+  { id: 19, name: l("Lammfleisch mit Knochen", "Lamb on the bone", "Hilib ido"), size: kg, price: 1399, was: 1599, category: "meat", icon: "meat", hue: 10, keywords: ["lamm", "lamb", "hilib ido"] },
+  { id: 20, name: l("Hähnchenschenkel", "Chicken thighs", "Bawdo digaag"), size: kg, price: 699, category: "meat", icon: "drumstick", hue: 24, keywords: ["hähnchen", "huhn", "chicken", "digaag"] },
+  { id: 21, name: l("Rinderhack", "Beef mince", "Hilib lo'aad shiidan"), size: g(500), price: 549, category: "meat", icon: "meat", hue: 0, keywords: ["rinderhack", "hack", "beef", "mince", "lo'aad"] },
+  { id: 22, name: l("Oodkac (Trockenfleisch)", "Oodkac dried beef", "Oodkac"), size: g(250), price: 1299, category: "meat", icon: "meat", hue: 14, keywords: ["oodkac", "odkac", "muqmad", "trockenfleisch"], homeFavourite: true },
+  { id: 23, name: l("Tilapia, ganz", "Whole tilapia", "Kalluun tilapia"), size: kg, price: 899, category: "meat", icon: "fish", hue: 196, keywords: ["fisch", "fish", "tilapia", "kalluun"] },
+
+  { id: 24, name: l("Basmatireis", "Basmati rice", "Bariis basmati"), size: l("5 kg", "5 kg", "5 kg"), price: 1199, was: 1399, category: "pantry", icon: "grains", hue: 44, keywords: ["reis", "rice", "bariis", "basmati"] },
+  { id: 25, name: l("Spaghetti", "Spaghetti", "Baasto"), size: g(500), price: 129, category: "pantry", icon: "pasta", hue: 46, keywords: ["spaghetti", "nudeln", "pasta", "baasto"] },
+  { id: 26, name: l("Sorghummehl", "Sorghum flour", "Bur haruur"), size: kg, price: 349, category: "pantry", icon: "grains", hue: 30, keywords: ["sorghum", "haruur", "mehl", "flour", "bur"] },
+  { id: 27, name: l("Xawaash Gewürzmischung", "Xawaash spice blend", "Xawaash"), size: g(200), price: 449, category: "pantry", icon: "spice", hue: 18, keywords: ["xawaash", "gewürz", "spice"], homeFavourite: true, photo: "/photos/xawaash.jpg" },
+  { id: 28, name: l("Grüner Kardamom", "Green cardamom", "Heyl"), size: g(100), price: 499, category: "pantry", icon: "spice", hue: 90, keywords: ["kardamom", "cardamom", "heyl"] },
+  { id: 29, name: l("Rote Linsen", "Red lentils", "Misir"), size: kg, price: 249, category: "pantry", icon: "bean", hue: 16, keywords: ["linsen", "lentil", "misir"] },
+  { id: 30, name: l("Medjool Datteln", "Medjool dates", "Timir"), size: kg, price: 899, was: 1099, category: "pantry", icon: "date", hue: 22, keywords: ["datteln", "dattel", "dates", "timir"], photo: "/photos/dates.jpg" },
+  { id: 31, name: l("Sesamöl", "Sesame oil", "Saliid macsaro"), size: l("1 L", "1 L", "1 L"), price: 699, category: "pantry", icon: "oil", hue: 52, keywords: ["sesam", "sesamöl", "sesame", "oil", "saliid", "macsaro"] },
+
+  { id: 32, name: l("Schwarzer Tee, lose", "Loose black tea", "Shaah"), size: g(500), price: 399, category: "drinks", icon: "tea", hue: 20, keywords: ["tee", "tea", "shaah"] },
+  { id: 33, name: l("Mangosaft", "Mango juice", "Casiir cambe"), size: l("1 L", "1 L", "1 L"), price: 199, category: "drinks", icon: "juice", hue: 38, keywords: ["saft", "juice", "casiir"] },
+  { id: 34, name: l("Fruchtsirup", "Fruit cordial", "Sharoobo miro"), size: l("710 ml", "710 ml", "710 ml"), price: 349, category: "drinks", icon: "juice", hue: 320, keywords: ["sirup", "cordial", "sharoobo", "vimto"] },
+  { id: 35, name: l("Mineralwasser", "Still water", "Biyo"), size: l("6 x 1,5 L", "6 x 1.5 L", "6 x 1.5 L"), price: 299, was: 349, category: "drinks", icon: "water", hue: 200, keywords: ["wasser", "water", "biyo"] },
+
+  { id: 36, name: l("Xalwo (Halwa)", "Somali xalwo", "Xalwo"), size: g(500), price: 799, category: "snacks", icon: "sweet", hue: 12, keywords: ["xalwo", "halwa", "halva"], homeFavourite: true },
+  { id: 37, name: l("Teekekse", "Tea biscuits", "Buskud"), size: g(400), price: 199, category: "snacks", icon: "cookie", hue: 32, keywords: ["kekse", "biscuit", "cookie", "buskud"] },
+  { id: 38, name: l("Geröstete Erdnüsse", "Roasted peanuts", "Looska la dubay"), size: g(500), price: 299, was: 349, category: "snacks", icon: "nuts", hue: 30, keywords: ["erdnüsse", "nüsse", "peanut", "nuts", "loos"] },
+
+  { id: 39, name: l("Spülmittel", "Washing-up liquid", "Saabuun weel"), size: l("500 ml", "500 ml", "500 ml"), price: 149, category: "home", icon: "soap", hue: 150, keywords: ["spülmittel", "washing up", "dish", "saabuun"] },
+  { id: 40, name: l("Waschmittel", "Laundry detergent", "Saabuunta dharka"), size: l("20 Waschgänge", "20 washes", "20 jeer"), price: 599, was: 749, category: "home", icon: "laundry", hue: 220, keywords: ["waschmittel", "laundry", "detergent", "dhar"] },
+  { id: 41, name: l("Uunsi Räucherwerk", "Uunsi incense", "Uunsi"), size: g(100), price: 649, category: "home", icon: "incense", hue: 28, keywords: ["uunsi", "foox", "weihrauch", "incense", "frankincense"], homeFavourite: true, photo: "/photos/uunsi.jpg" },
+
+  { id: 42, name: l("Windeln Größe 4", "Nappies, size 4", "Xafaayad cabbir 4"), size: pcs(44), price: 1199, was: 1399, category: "baby", icon: "baby", hue: 260, keywords: ["windel", "nappy", "nappies", "diaper", "xafaayad"] },
+  { id: 43, name: l("Feuchttücher", "Baby wipes", "Masaxaad ilmo"), size: l("3 x 64", "3 x 64", "3 x 64"), price: 349, category: "baby", icon: "baby", hue: 180, keywords: ["feuchttücher", "wipes", "masaxaad"] },
 ];
+
+const weekdays = l("Mo-Sa 8-21 Uhr", "Mon-Sat 8:00-21:00", "Isniin-Sabti 8:00-21:00");
 
 export const STORES: Store[] = [
-  { id: "nahda", name: "Al Nahda", city: "Dubai", area: "Near Al Nahda Park", hours: "Open 7 AM to 2 AM" },
-  { id: "qusais", name: "Al Qusais", city: "Dubai", area: "Damascus Street", hours: "Open 24 hours" },
-  { id: "muwaileh", name: "Muwaileh", city: "Sharjah", area: "University City Road", hours: "Open 7 AM to 1 AM" },
-  { id: "mussafah", name: "Mussafah", city: "Abu Dhabi", area: "Shabiya 10", hours: "Open 24 hours" },
+  { id: "frankfurt", name: "Frankfurt Gallus", city: "Frankfurt am Main", area: "Mainzer Landstraße 214", hours: weekdays },
+  { id: "koeln", name: "Köln Kalk", city: "Köln", area: "Kalker Hauptstraße 88", hours: weekdays },
+  { id: "muenchen", name: "München Hasenbergl", city: "München", area: "Dülferstraße 31", hours: l("Mo-Sa 9-20 Uhr", "Mon-Sat 9:00-20:00", "Isniin-Sabti 9:00-20:00") },
+  { id: "hamburg", name: "Hamburg St. Georg", city: "Hamburg", area: "Steindamm 47", hours: weekdays },
 ];
-
-export const PRODUCTS_BY_ID = new Map(PRODUCTS.map((p) => [p.id, p]));
-export const STORE_IDS = new Set(STORES.map((s) => s.id));

@@ -1,69 +1,70 @@
-import Image from "next/image";
+import { cacheLife } from "next/cache";
+import { AisleNav, AisleTiles } from "@/components/aisle-nav";
+import { BasketPanel } from "@/components/basket-panel";
+import { CartDrawer } from "@/components/cart-drawer";
+import { Catalog } from "@/components/catalog";
+import { HomeFavourites } from "@/components/home-favourites";
+import { MobileBar } from "@/components/mobile-bar";
+import { Offers } from "@/components/offers";
+import { BrowseProvider } from "@/components/providers/browse-provider";
+import { LangProvider } from "@/components/providers/lang-provider";
+import { ShopProvider } from "@/components/providers/shop-provider";
+import { ToastProvider } from "@/components/providers/toast-provider";
+import { Services } from "@/components/services";
+import { SiteFooter } from "@/components/site-footer";
+import { SiteHeader } from "@/components/site-header";
+import { SmartList } from "@/components/smart-list";
+import { StoreList } from "@/components/store-list";
+import { getCatalog } from "@/lib/data";
+import { TIME_ZONE } from "@/lib/slots";
 
-export default function Home() {
+// Offers run Friday to Thursday (Berlin time). Returns the coming Thursday as YYYY-MM-DD.
+async function offerEnd() {
+  "use cache";
+  cacheLife("hours");
+  const [y, m, d] = new Date().toLocaleDateString("en-CA", { timeZone: TIME_ZONE }).split("-").map(Number);
+  const today = new Date(Date.UTC(y, m - 1, d));
+  today.setUTCDate(today.getUTCDate() + ((4 - today.getUTCDay() + 7) % 7 || 7));
+  return today.toISOString().slice(0, 10);
+}
+
+// One page, two shapes: on desktop aisles | products | basket (three columns);
+// on phones and in the installed app the aisles become tiles and the basket a bar above a bottom menu.
+export default async function Home() {
+  const [catalog, endsOn] = await Promise.all([getCatalog(), offerEnd()]);
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+    <LangProvider>
+      <ToastProvider>
+        <ShopProvider products={catalog.products} categories={catalog.categories} stores={catalog.stores}>
+          <BrowseProvider>
+            <SiteHeader />
+            <div className="gutter mx-auto grid max-w-[1600px] gap-6 pt-4 lg:grid-cols-[212px_minmax(0,1fr)] lg:gap-6 lg:pt-5 xl:grid-cols-[224px_minmax(0,1fr)_330px]">
+              <div className="hidden lg:block">
+                <AisleNav />
+              </div>
+              <main className="min-w-0 space-y-8">
+                <HomeFavourites />
+                <div id="aisles" className="scroll-mt-24 lg:hidden">
+                  <AisleTiles />
+                </div>
+                <div id="list" className="scroll-mt-24 lg:hidden">
+                  <SmartList />
+                </div>
+                <Offers endsOn={endsOn} />
+                <Catalog />
+                <Services />
+                <StoreList />
+              </main>
+              <div className="hidden xl:block">
+                <BasketPanel />
+              </div>
+            </div>
+            <SiteFooter />
+            <MobileBar />
+            <CartDrawer />
+          </BrowseProvider>
+        </ShopProvider>
+      </ToastProvider>
+    </LangProvider>
   );
 }

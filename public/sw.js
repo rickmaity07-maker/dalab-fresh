@@ -1,0 +1,51 @@
+// Dalab Fresh service worker: lets the installed app open instantly and show the last shop page when offline.
+// Pages: network first, falling back to the cached copy. Static files and photos: cache first.
+// API calls (orders, tracking) are never cached.
+const VERSION = "dalab-v1";
+const SHELL = ["/", "/manifest.webmanifest", "/icons/icon-192.png"];
+
+self.addEventListener("install", (event) => {
+  event.waitUntil(caches.open(VERSION).then((cache) => cache.addAll(SHELL)).then(() => self.skipWaiting()));
+});
+
+self.addEventListener("activate", (event) => {
+  event.waitUntil(
+    caches.keys()
+      .then((keys) => Promise.all(keys.filter((k) => k !== VERSION).map((k) => caches.delete(k))))
+      .then(() => self.clients.claim()),
+  );
+});
+
+self.addEventListener("fetch", (event) => {
+  const { request } = event;
+  const url = new URL(request.url);
+  if (request.method !== "GET" || url.origin !== self.location.origin || url.pathname.startsWith("/api/")) return;
+
+  if (request.mode === "navigate") {
+    event.respondWith(
+      fetch(request)
+        .then((res) => {
+          const copy = res.clone();
+          caches.open(VERSION).then((cache) => cache.put("/", copy));
+          return res;
+        })
+        .catch(() => caches.match("/").then((hit) => hit || Response.error())),
+    );
+    return;
+  }
+
+  if (url.pathname.startsWith("/_next/static/") || url.pathname.startsWith("/photos/") || url.pathname.startsWith("/icons/") || url.pathname.startsWith("/_next/image")) {
+    event.respondWith(
+      caches.match(request).then((hit) =>
+        hit ||
+        fetch(request).then((res) => {
+          if (res.ok) {
+            const copy = res.clone();
+            caches.open(VERSION).then((cache) => cache.put(request, copy));
+          }
+          return res;
+        }),
+      ),
+    );
+  }
+});
