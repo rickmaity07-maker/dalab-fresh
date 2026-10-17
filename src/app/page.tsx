@@ -37,12 +37,13 @@ export default async function Home() {
       <ToastProvider>
         <ShopProvider products={catalog.products} categories={catalog.categories} stores={catalog.stores}>
           <BrowseProvider>
+            <a href="#main" className="sr-only z-50 rounded-[10px] bg-ink px-4 py-2.5 font-semibold text-bg focus:not-sr-only focus:fixed focus:top-3 focus:left-3">Zum Inhalt springen</a>
             <SiteHeader />
             <div className="gutter mx-auto grid max-w-[1600px] gap-6 pt-4 lg:grid-cols-[212px_minmax(0,1fr)] lg:gap-6 lg:pt-5 xl:grid-cols-[224px_minmax(0,1fr)_330px]">
               <div className="hidden lg:block">
                 <AisleNav />
               </div>
-              <main className="min-w-0 space-y-8">
+              <main id="main" className="min-w-0 space-y-8">
                 <HomeFavourites />
                 <div id="aisles" className="scroll-mt-24 lg:hidden">
                   <AisleTiles />

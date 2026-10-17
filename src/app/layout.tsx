@@ -1,17 +1,13 @@
 import type { Metadata, Viewport } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import { ServiceWorker } from "@/components/service-worker";
+import { SITE_URL } from "@/lib/site-url";
 import "./globals.css";
 
 const jakarta = Plus_Jakarta_Sans({ variable: "--font-jakarta", subsets: ["latin", "latin-ext"] });
 
-// Absolute base for share images: NEXT_PUBLIC_SITE_URL if set, else the Vercel production domain.
-const siteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL ??
-  (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : "http://localhost:3000");
-
 export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl),
+  metadataBase: new URL(SITE_URL),
   title: "Dalab Fresh: Somalischer Supermarkt",
   description:
     "Somalische und ostafrikanische Lebensmittel in Deutschland: Canjeero, Halal Fleisch, Xawaash und mehr. Lieferung am selben Tag oder Abholung in Frankfurt, Köln, München und Hamburg.",

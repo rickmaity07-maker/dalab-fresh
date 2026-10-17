@@ -84,6 +84,8 @@ export type Order = {
   lang: Lang;
   items: (CartLine & { name: string; price: number })[];
   quote: Quote;
+  /** Progress set by staff on /admin; missing on file orders saved before it existed. */
+  stage?: TrackingStage;
 };
 
 export type TrackingStage = 0 | 1 | 2 | 3;

@@ -1,6 +1,7 @@
 "use client";
 
 import { BasketIcon, CheckIcon, CreditCardIcon, MapPinIcon, MoneyIcon, StorefrontIcon, TruckIcon, XIcon } from "@phosphor-icons/react";
+import Link from "next/link";
 import { useEffect, useRef, useState, useTransition } from "react";
 import { describeSlot, type Dict } from "@/lib/i18n";
 import { FREE_DELIVERY_OVER } from "@/lib/pricing";
@@ -204,6 +205,10 @@ function CheckoutView() {
       </form>
       <Footer>
         <Summary quote={meta.quote} mode={state.mode} express={state.slotId === "express"} />
+        <p className="text-[12px] leading-snug text-muted">
+          {t.checkout.legal[0]}<Link href="/agb" className="underline underline-offset-2 hover:text-ink">{t.checkout.legal[1]}</Link>{t.checkout.legal[2]}
+          <Link href="/datenschutz" className="underline underline-offset-2 hover:text-ink">{t.checkout.legal[3]}</Link>{t.checkout.legal[4]}
+        </p>
         <button type="submit" form="checkout" disabled={pending} className={button.primary}>{pending ? t.checkout.placing : t.checkout.place}</button>
         <button type="button" className={button.ghost} onClick={() => actions.openDrawer("basket")}>{t.checkout.back}</button>
       </Footer>

@@ -181,6 +181,7 @@ const en = {
     cardNote: "EC card, Visa or Mastercard",
     cash: "Cash",
     cashNote: "Exact change helps",
+    legal: ["By ordering you accept our ", "terms", ". See our ", "privacy policy", " for how we use your data. Fresh food cannot be returned."] as [string, string, string, string, string],
     place: "Place order",
     placing: "Placing order",
     back: "Back to basket",
@@ -229,6 +230,7 @@ const en = {
     help: "Help",
     links: { aisles: "All aisles", offers: "Offers", delivery: "Delivery times", track: "Track an order", stores: "Stores and hours" },
     proverb: "Somali proverb: hands working together get things done.",
+    legal: { imprint: "Legal notice", privacy: "Privacy", terms: "Terms & cancellation" },
   },
   email: {
     subject: (id: string) => `Your Dalab Fresh order ${id}`,
@@ -413,6 +415,7 @@ const de: Dict = {
     cardNote: "EC-Karte, Visa oder Mastercard",
     cash: "Bar",
     cashNote: "Passendes Kleingeld hilft",
+    legal: ["Es gelten unsere ", "AGB", ". Hinweise zur Datenverarbeitung findest du in der ", "Datenschutzerklärung", ". Frische Lebensmittel sind vom Widerruf ausgeschlossen."],
     place: "Zahlungspflichtig bestellen",
     placing: "Bestellung wird gesendet",
     back: "Zurück zum Warenkorb",
@@ -461,6 +464,7 @@ const de: Dict = {
     help: "Hilfe",
     links: { aisles: "Alle Abteilungen", offers: "Angebote", delivery: "Lieferzeiten", track: "Bestellung verfolgen", stores: "Filialen und Öffnungszeiten" },
     proverb: "Somalisches Sprichwort: Gemeinsam schafft man mehr.",
+    legal: { imprint: "Impressum", privacy: "Datenschutz", terms: "AGB & Widerruf" },
   },
   email: {
     subject: (id: string) => `Deine Dalab Fresh Bestellung ${id}`,
@@ -643,6 +647,7 @@ const so: Dict = {
     cardNote: "Kaarka EC, Visa ama Mastercard",
     cash: "Lacag caddaan ah",
     cashNote: "Lacag sax ah ayaa fiican",
+    legal: ["Markaad dalbato waxaad aqbashaa ", "shuruudahayaga", ". Akhri ", "siyaasadda asturnaanta", " si aad u ogaato sida xogtaada loo isticmaalo. Cuntada cusub lama soo celin karo."],
     place: "Dir dalabka",
     placing: "Dalabka waa la dirayaa",
     back: "Ku noqo dambiisha",
@@ -691,6 +696,7 @@ const so: Dict = {
     help: "Caawimaad",
     links: { aisles: "Dhammaan qaybaha", offers: "Qiimo dhimis", delivery: "Waqtiyada gaarsiinta", track: "La soco dalab", stores: "Dukaamada iyo saacadaha" },
     proverb: "Maahmaah Soomaaliyeed.",
+    legal: { imprint: "Macluumaadka sharciga", privacy: "Asturnaanta", terms: "Shuruudaha & ka noqoshada" },
   },
   email: {
     subject: (id: string) => `Dalabkaaga Dalab Fresh ${id}`,

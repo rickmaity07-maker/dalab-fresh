@@ -1,7 +1,9 @@
 import "server-only";
 import nodemailer, { type Transporter } from "nodemailer";
+import { BUSINESS, BUSINESS_ADDRESS } from "./business";
 import { DICTS, describeSlot } from "./i18n";
 import { formatEur } from "./pricing";
+import { SITE_URL } from "./site-url";
 import type { Order, Store } from "./types";
 
 // SMTP settings come from the environment (any provider: Brevo, Mailjet, IONOS, Gmail app password...).
@@ -64,16 +66,17 @@ function render(order: Order, store: Store, now: Date) {
     `<tr><td style="padding:6px 0;${strong ? "font-weight:700;font-size:17px" : ""}">${esc(l)}</td><td style="padding:6px 0;text-align:right;white-space:nowrap;${strong ? "font-weight:700;font-size:17px" : ""}">${esc(a)}</td></tr>`;
 
   // Table layout and inline styles: email clients ignore most modern CSS.
-  const html = `<!doctype html><html lang="${order.lang}"><body style="margin:0;background:#f6f6f3;font-family:Arial,Helvetica,sans-serif;color:#0f1a2e">
+  const html = `<!doctype html><html lang="${order.lang}"><body style="margin:0;background:#f4f4f1;font-family:Arial,Helvetica,sans-serif;color:#141414">
 <table role="presentation" width="100%" cellspacing="0" cellpadding="0"><tr><td align="center" style="padding:24px 12px">
-<table role="presentation" width="100%" style="max-width:560px;background:#fdfdfb;border-radius:16px;overflow:hidden" cellspacing="0" cellpadding="0">
-<tr><td style="height:10px;background:#d93a26"></td></tr>
-<tr><td style="padding:28px 28px 8px"><div style="font-size:22px;font-weight:800">Dalab Fresh</div></td></tr>
-<tr><td style="padding:0 28px 8px;line-height:1.5"><p>${esc(t.email.hello(order.name))}<br>${esc(t.email.intro)}</p>
-<p style="background:#ecede8;border-radius:12px;padding:14px 16px;margin:16px 0"><b>${esc(order.id)}</b><br>${esc(when)}${order.address ? `<br>${esc(order.address)}` : ""}<br>${esc(t.email.payment(order.payment))}</p></td></tr>
-<tr><td style="padding:0 28px"><table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="font-size:15px;border-bottom:1px solid #dcdfd8">${rows.map((r) => line(r.label, r.amount)).join("")}</table>
+<table role="presentation" width="100%" style="max-width:560px;background:#ffffff;border-radius:14px;overflow:hidden" cellspacing="0" cellpadding="0">
+<tr><td style="background:#141414;padding:20px 28px;font-size:22px;font-weight:800;color:#ffffff">Dalab <span style="color:#e3b23c">Fresh</span></td></tr>
+<tr><td style="height:4px;background:#e3b23c"></td></tr>
+<tr><td style="padding:20px 28px 8px;line-height:1.5"><p>${esc(t.email.hello(order.name))}<br>${esc(t.email.intro)}</p>
+<p style="background:#fbf3dd;border-radius:10px;padding:14px 16px;margin:16px 0"><b>${esc(order.id)}</b><br>${esc(when)}${order.address ? `<br>${esc(order.address)}` : ""}<br>${esc(t.email.payment(order.payment))}</p></td></tr>
+<tr><td style="padding:0 28px"><table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="font-size:15px;border-bottom:1px solid #e8e6e1">${rows.map((r) => line(r.label, r.amount)).join("")}</table>
 <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="font-size:15px;margin-top:8px">${totals.map((r) => line(r.label, r.amount)).join("")}${line(t.basket.total, money(order.quote.total), true)}</table></td></tr>
-<tr><td style="padding:20px 28px 28px;color:#586174;font-size:14px">${esc(t.email.bye)}</td></tr>
+<tr><td style="padding:20px 28px 8px;color:#6b6a66;font-size:14px">${esc(t.email.bye)}</td></tr>
+<tr><td style="padding:12px 28px 24px;color:#6b6a66;font-size:12px;border-top:1px solid #e8e6e1">${esc(BUSINESS.legalName)}, ${esc(BUSINESS_ADDRESS)}<br><a href="${SITE_URL}/impressum" style="color:#6b6a66">Impressum</a> &middot; <a href="${SITE_URL}/agb" style="color:#6b6a66">AGB</a> &middot; <a href="${SITE_URL}/datenschutz" style="color:#6b6a66">Datenschutz</a></td></tr>
 </table></td></tr></table></body></html>`;
 
   return { subject: t.email.subject(order.id), text, html };
@@ -83,20 +86,22 @@ function render(order: Order, store: Store, now: Date) {
 export async function sendOrderEmails(order: Order, store: Store, now = new Date()) {
   const tx = await getTransport();
   if (!tx) return;
-  const from = process.env.MAIL_FROM || "Dalab Fresh <bestellung@dalab-fresh.de>";
+  // Gmail and most providers only accept their own address as sender, so default to the SMTP login.
+  const from = process.env.MAIL_FROM || `Dalab Fresh <${process.env.SMTP_USER || BUSINESS.email}>`;
   try {
     const msg = render(order, store, now);
     const info = await tx.sendMail({ from, to: order.email, ...msg });
     const preview = nodemailer.getTestMessageUrl(info);
     if (preview) console.info(`[mail] Customer email for ${order.id}: ${preview}`);
 
-    const staff = process.env.STORE_EMAIL;
+    // Staff copy: STORE_EMAIL, or the sending mailbox itself (e.g. the shop's Gmail) when none is set.
+    const staff = process.env.STORE_EMAIL || process.env.SMTP_USER;
     if (staff) {
       const de = render({ ...order, lang: "de" }, store, now);
       await tx.sendMail({
         from, to: staff, replyTo: order.email,
         subject: DICTS.de.email.staffSubject(order.id, formatEur(order.quote.total, "de")),
-        text: `${order.name} <${order.email}>${order.phone ? `, ${order.phone}` : ""}\n${store.name}\n\n${de.text}`,
+        text: `${order.name} <${order.email}>${order.phone ? `, ${order.phone}` : ""}\n${store.name}\n${SITE_URL}/admin\n\n${de.text}`,
       });
     }
   } catch (err) {

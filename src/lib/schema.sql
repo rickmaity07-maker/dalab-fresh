@@ -54,3 +54,8 @@ create index if not exists orders_email_idx on orders (lower(email));
 -- Bundled photos (paths under /public), used until a Cloudinary image is uploaded.
 alter table products add column if not exists photo text;
 alter table categories add column if not exists photo text;
+
+-- Order progress set by staff on /admin: 0 placed, 1 packing, 2 on the way / ready to collect, 3 done.
+alter table orders add column if not exists stage int not null default 0 check (stage between 0 and 3);
+alter table orders add column if not exists stage_at timestamptz;
+create index if not exists orders_open_idx on orders (stage, placed_at desc);

@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+import { BUSINESS } from "@/lib/business";
 import { BrandMark } from "./brand-mark";
 import { useLang } from "./providers/lang-provider";
 import { LanguageSwitch } from "./site-header";
@@ -33,6 +35,14 @@ export function SiteFooter() {
             </ul>
           </nav>
         ))}
+      </div>
+      <div className="gutter mx-auto mt-10 flex max-w-[1600px] flex-wrap items-center gap-x-6 gap-y-2 border-t border-white/10 pt-5 text-[13px]">
+        <nav aria-label={t.footer.legal.imprint} className="flex flex-wrap gap-x-6 gap-y-2">
+          <Link href="/impressum" className="transition-colors hover:text-[#e3b23c]">{t.footer.legal.imprint}</Link>
+          <Link href="/datenschutz" className="transition-colors hover:text-[#e3b23c]">{t.footer.legal.privacy}</Link>
+          <Link href="/agb" className="transition-colors hover:text-[#e3b23c]">{t.footer.legal.terms}</Link>
+        </nav>
+        <span className="sm:ml-auto">© 2026 {BUSINESS.legalName}</span>
       </div>
     </footer>
   );
